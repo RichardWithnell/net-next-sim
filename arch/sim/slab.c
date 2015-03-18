@@ -146,6 +146,11 @@ void free_pages(unsigned long addr, unsigned int order)
     }
 }
 
+void *vzalloc(unsigned long size)
+{
+  return kmalloc (size, GFP_KERNEL | __GFP_HIGHMEM | __GFP_ZERO);
+}
+
 void *vmalloc(unsigned long size)
 {
   return sim_malloc (size);
