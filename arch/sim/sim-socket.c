@@ -26,6 +26,7 @@ int sim_sock_socket (int domain, int type, int protocol, struct SimSocket **sock
 {
   struct socket **kernel_socket = (struct socket **)socket;
   int retval = sock_create (domain, type, protocol, kernel_socket);
+  type &= SOCK_TYPE_MASK;
   /* XXX: SCTP code never look at flags args, but file flags instead. */
   struct file *fp = sim_malloc (sizeof (struct file));
   (*kernel_socket)->file = fp;
