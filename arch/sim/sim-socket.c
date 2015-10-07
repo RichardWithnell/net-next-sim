@@ -24,13 +24,22 @@ static struct iovec *copy_iovec (const struct iovec *input, int len)
 
 int sim_sock_socket (int domain, int type, int protocol, struct SimSocket **socket)
 {
-  struct socket **kernel_socket = (struct socket **)socket;
-  int retval = sock_create (domain, type, protocol, kernel_socket);
-  type &= SOCK_TYPE_MASK;
-  /* XXX: SCTP code never look at flags args, but file flags instead. */
-  struct file *fp = sim_malloc (sizeof (struct file));
-  (*kernel_socket)->file = fp;
-  return retval;
+    struct socket **kernel_socket = (struct socket **)socket;
+    int flags;
+
+    /* from net/socket.c */
+    flags = type & ~SOCK_TYPE_MASK;
+    if (flags & ~(SOCK_CLOEXEC | SOCK_NONBLOCK))
+        return -EINVAL;
+    type &= SOCK_TYPE_MASK;
+
+    int retval = sock_create(domain, type, protocol, kernel_socket);
+    /* XXX: SCTP code never look at flags args, but file flags instead. */
+    struct file *fp = sim_malloc(sizeof(struct file));
+    (*kernel_socket)->file = fp;
+    fp->f_cred = sim_malloc(sizeof(struct cred));
+    return retval;
+
 }
 int sim_sock_close (struct SimSocket *socket)
 {
