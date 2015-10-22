@@ -3,7 +3,7 @@ ADD_PARAM?=
 all: test
 
 bake:
-	hg clone http://code.nsnam.org/bake
+	git clone http://github.com/richardwithnell/bake.git
 
 check_pkgs:
 	@./bake/bake.py check | grep Bazaar | grep OK || (echo "bzr is missing" && ./bake/bake.py check)
