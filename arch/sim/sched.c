@@ -117,7 +117,8 @@ void add_wait_queue_exclusive(wait_queue_head_t *q, wait_queue_t *wait)
 }
 void remove_wait_queue(wait_queue_head_t *q, wait_queue_t *wait)
 {
-  list_del(&wait->task_list);
+  if (wait->task_list.prev != LIST_POISON2)
+    list_del(&wait->task_list);
 }
 void
 prepare_to_wait_exclusive(wait_queue_head_t *q, wait_queue_t *wait, int state)
@@ -149,7 +150,7 @@ void finish_wait(wait_queue_head_t *q, wait_queue_t *wait)
 int autoremove_wake_function(wait_queue_t *wait, unsigned mode, int sync, void *key)
 {
   int ret = default_wake_function(wait, mode, sync, key);
-  if (ret)
+  if (ret && (wait->task_list.prev != LIST_POISON2))
     list_del_init(&wait->task_list);
   return ret;
 }
@@ -181,11 +182,13 @@ unsigned long wait_for_completion_timeout(struct completion *x, unsigned long ti
       wait.flags |= WQ_FLAG_EXCLUSIVE;
       list_add_tail(&wait.task_list, &x->wait.task_list);
       do {
-	timeout = schedule_timeout (timeout);
+	    timeout = schedule_timeout (timeout);
       } while (!x->done && timeout);
-      list_del (&wait.task_list);
+      if (wait.task_list.prev != LIST_POISON2){
+        list_del (&wait.task_list);
+      }
       if (!x->done)
-	return timeout;
+	    return timeout;
     }
   x->done--;
   return timeout ?: 1;
