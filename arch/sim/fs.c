@@ -263,7 +263,7 @@ void get_filesystem(struct file_system_type *fs)
 //#include <fs/proc/proc_sysctl.c>
 unsigned int nr_free_buffer_pages(void)
 {
-	return 1024;
+	return 65535;
 }
 
 const struct pipe_buf_operations nosteal_pipe_buf_ops = {

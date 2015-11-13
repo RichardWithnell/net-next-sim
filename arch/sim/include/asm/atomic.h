@@ -19,8 +19,11 @@ static inline void atomic64_sub(long i, atomic64_t *v)
 	v->counter -= i;
 }
 int atomic64_sub_and_test(long i, atomic64_t *v);
-void atomic64_inc(atomic64_t *v);
-void atomic64_dec(atomic64_t *v);
+static inline void atomic64_inc(atomic64_t *v)
+{
+    v->counter++;
+}
+#define atomic64_dec(v)         atomic64_sub(1LL, (v))
 int atomic64_dec_and_test(atomic64_t *v);
 int atomic64_inc_and_test(atomic64_t *v);
 int atomic64_add_negative(long i, atomic64_t *v);
@@ -31,12 +34,21 @@ static inline long atomic64_add_return(long i, atomic64_t *v)
     return    v->counter;
  }
 long atomic64_sub_return(long i, atomic64_t *v);
-long atomic64_inc_return(atomic64_t *v);
-long atomic64_dec_return(atomic64_t *v);
-long atomic64_cmpxchg(atomic64_t *v, long old, long new);
+#define atomic64_inc_return(v)  (atomic64_add_return(1, (v)))
+#define atomic64_dec_return(v)  (atomic64_sub_return(1, (v)))
+static inline long atomic64_cmpxchg(atomic64_t *v, long old, long new)
+{
+    long long val;
+
+    val = v->counter;
+    if (val == old)
+        v->counter = new;
+    return val;
+}
 long atomic64_xchg(atomic64_t *v, long new);
 int atomic64_add_unless(atomic64_t *v, long a, long u);
 int atomic64_inc_is_not_zero(atomic64_t *v);
+#define atomic64_inc_not_zero(v)    atomic64_add_unless((v), 1LL, 0LL)
 
 #include <asm-generic/atomic.h>
 

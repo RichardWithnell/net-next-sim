@@ -40,5 +40,6 @@ struct ctl_table random_table[] = {
     .maxlen         = sizeof(int),
     .mode           = 0444,
     .proc_handler   = proc_dointvec,
-  }
+  },
+  {}
 };

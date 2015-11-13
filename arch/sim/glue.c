@@ -45,7 +45,7 @@ struct uts_namespace init_uts_ns = {
 
 // XXX: used in network stack !
 unsigned long num_physpages = 0;
-unsigned long totalram_pages = 0;
+unsigned long totalram_pages = 8192;
 
 // XXX figure out initial value
 unsigned int interrupt_pending = 0;
@@ -321,6 +321,12 @@ int sched_rr_handler(struct ctl_table *table, int write,
                      loff_t *ppos)
 {
   return 0;
+}
+
+int sysctl_max_threads(struct ctl_table *table, int write,
+              void __user *buffer, size_t *lenp, loff_t *ppos)
+{
+   return 1;
 }
 
 void on_each_cpu_mask(const struct cpumask *mask,
