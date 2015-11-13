@@ -130,11 +130,6 @@ void sim_printf(const char *str, ...)
   va_end (args);
 }
 
-void atomic64_inc(atomic64_t *v)
-{
-  v->counter++;
-}
-
 #include <linux/vmalloc.h>
 #include <linux/kmemleak.h>
 
